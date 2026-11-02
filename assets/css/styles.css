@@ -146,15 +146,12 @@ button { cursor: pointer; }
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
   flex-shrink: 0;
 }
-.brand__mark { width: 27px; height: 27px; color: var(--ink); }
-.brand__name {
-  font-size: var(--step-body);
-  font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 1;
+.brand__logo {
+  display: block;
+  width: auto;
+  height: 34px;
 }
 
 .nav {
@@ -907,11 +904,11 @@ h3 {
 .footer .container { container-type: inline-size; }
 .footer__word {
   margin: clamp(56px, 8vw, 100px) 0 clamp(64px, 8vw, 112px);
-  font-size: 16vw;
-  font-size: 22.4cqw;
+  font-size: 13vw;
+  font-size: 18cqw;
   font-weight: 600;
   line-height: 0.92;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.03em;
   white-space: nowrap;
   color: #fff;
 }
@@ -1005,6 +1002,7 @@ h3 {
   }
 
   .site-head__inner { height: 72px; }
+  .brand__logo { height: 30px; }
   .menu-btn__label { display: none; }
   .head-cta { min-height: 38px; padding: 0 13px; font-size: 0.8125rem; }
   .head-cta__long { display: none; }

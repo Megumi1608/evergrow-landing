@@ -23,11 +23,11 @@ index.html
 assets/
   css/styles.css
   js/main.js
-  img/            # ảnh WebP đã tối ưu
+  img/            # ảnh WebP đã tối ưu + logo Evergrow (PNG trong suốt)
   photos/         # ảnh gốc + credits.json
   fonts/          # Be Vietnam Pro woff2 + OFL
   vendor/         # GSAP 3.13.0 + ScrollTrigger
-favicon.svg
+favicon.png
 ```
 
 ## Tính năng
@@ -45,7 +45,7 @@ favicon.svg
 - `hello@evergrow.vn`, văn phòng `TP.HCM · Hải Phòng · Hà Nội`, giờ làm việc.
 - Khoảng thời gian vận chuyển trong bộ chọn tuyến là số liệu tham khảo, chưa gồm thông quan.
 - Form chưa nối CRM/backend; hiện mở mail client.
-- Logo hiện là wordmark + leaf mark được vẽ cho bản dựng này; thay bằng logo chính thức nếu có.
+- Logo và favicon là bộ nhận hiệu chính thức (`assets/img/evergrow-logo.png`, `favicon.png`); chữ EVERGROW trong footer vẫn dựng bằng Be Vietnam Pro để nét ở mọi kích thước.
 - Ảnh là ảnh tìm được từ Wikimedia Commons, không phải ảnh của Evergrow. Xem credit bên dưới và ở footer.
 
 ## Ảnh và giấy phép

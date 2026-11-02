@@ -267,40 +267,27 @@
   const routeShip = document.getElementById("routeShip");
   const routeBox = document.querySelector(".showcase__route");
   const routeLength = routePath ? routePath.getTotalLength() : 0;
-  let shipScaleX = 1;
-  let shipScaleY = 1;
   let shipProgress = 0;
 
-  const measureRoute = () => {
-    if (!routeBox) return;
-    const rect = routeBox.getBoundingClientRect();
-    shipScaleX = rect.width / 1200;
-    shipScaleY = rect.height / 80;
-  };
-
   const placeShip = (progress) => {
-    if (!routePath || !routeShip) return;
+    if (!routePath || !routeShip || !routeBox) return;
+    const box = routeBox.getBoundingClientRect();
+    const scaleX = box.width / 1200;
+    const scaleY = box.height / 80;
     shipProgress = Math.min(1, Math.max(0, progress));
     const point = routePath.getPointAtLength(routeLength * shipProgress);
     const ahead = routePath.getPointAtLength(Math.min(routeLength, routeLength * shipProgress + 6));
-    const angle = (Math.atan2((ahead.y - point.y) * shipScaleY, (ahead.x - point.x) * shipScaleX) * 180) / Math.PI;
-    routeShip.style.setProperty("--ship-x", `${point.x * shipScaleX}px`);
-    routeShip.style.setProperty("--ship-y", `${point.y * shipScaleY}px`);
+    const angle = (Math.atan2((ahead.y - point.y) * scaleY, (ahead.x - point.x) * scaleX) * 180) / Math.PI;
+    routeShip.style.setProperty("--ship-x", `${point.x * scaleX}px`);
+    routeShip.style.setProperty("--ship-y", `${point.y * scaleY}px`);
     routeShip.style.setProperty("--ship-rot", `${angle}deg`);
     routeShip.style.opacity = "1";
   };
 
   if (routePath && routeShip) {
-    measureRoute();
     placeShip(0);
-    window.addEventListener("resize", () => {
-      measureRoute();
-      placeShip(shipProgress);
-    });
-    window.addEventListener("load", () => {
-      measureRoute();
-      placeShip(shipProgress);
-    });
+    window.addEventListener("resize", () => placeShip(shipProgress));
+    window.addEventListener("load", () => placeShip(shipProgress));
   }
 
   /* Motion */
