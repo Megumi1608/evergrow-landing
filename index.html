@@ -110,7 +110,7 @@
           <p class="split__copy body" data-reveal-item>Chọn một dịch vụ, hoặc để chúng tôi ghép nhiều chặng cho cùng một lô hàng.</p>
         </div>
 
-        <ul class="service-list" data-reveal-group>
+        <ul class="service-list">
           <li data-reveal-item>
             <a class="service" href="#lien-he" data-service="Vận tải biển">
               <span class="service__name">Vận tải biển</span>
@@ -272,14 +272,23 @@
           <p class="split__copy body" data-reveal-item>Cùng một bộ chứng từ, cùng một người phụ trách. Bạn thấy hàng rời kho và hàng đến tay, không phải hai câu chuyện rời nhau.</p>
         </div>
 
-        <div class="showcase__pair" data-reveal-group>
-          <div class="showcase__specimen" data-reveal-item>
-            <div class="showcase__crop"><span class="showcase__word">Đi</span></div>
-            <p class="showcase__cap">Lúc rời kho Việt Nam</p>
+        <div class="showcase__stage">
+          <div class="showcase__pair" data-reveal-group>
+            <div class="showcase__specimen" data-reveal-item>
+              <div class="showcase__crop"><span class="showcase__word">Đi</span></div>
+              <p class="showcase__cap">Lúc rời kho Việt Nam</p>
+            </div>
+            <div class="showcase__specimen" data-reveal-item>
+              <div class="showcase__crop"><span class="showcase__word">Đến</span></div>
+              <p class="showcase__cap">Lúc người nhận ký</p>
+            </div>
           </div>
-          <div class="showcase__specimen" data-reveal-item>
-            <div class="showcase__crop"><span class="showcase__word">Đến</span></div>
-            <p class="showcase__cap">Lúc người nhận ký</p>
+          <div class="showcase__route" aria-hidden="true">
+            <svg viewBox="0 0 1200 80" preserveAspectRatio="none">
+              <path class="showcase__routePath" d="M12 58C266 58 306 22 600 22S936 58 1188 58" fill="none" stroke="#0b6b4a" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="12" cy="58" r="4.5" fill="#0b6b4a"/>
+              <g class="showcase__leaf"><path d="M1188 58c-13-11-11-25 3-27 8 10 8 19-3 27Z" fill="#0b6b4a"/></g>
+            </svg>
           </div>
         </div>
       </div>
@@ -371,7 +380,7 @@
       </figure>
 
       <div class="container">
-        <ol class="steps" data-reveal-group>
+        <ol class="steps">
           <li class="step" data-reveal-item>
             <h3 class="step__title">Gửi yêu cầu.</h3>
             <p class="step__text">Bạn gửi loại hàng, trọng lượng, điểm đi và điểm đến. Chúng tôi hỏi thêm những gì còn thiếu.</p>

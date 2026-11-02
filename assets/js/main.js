@@ -239,23 +239,77 @@
 
     const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
     intro
-      .from(".hero__title", { y: 28, opacity: 0, duration: 1.15, delay: 0.08 })
-      .from(".hero__lead", { y: 18, opacity: 0, duration: 0.8 }, "-=0.7")
+      .from(".hero__title", { y: 44, opacity: 0, duration: 1.25, delay: 0.08 })
+      .from(".hero__lead", { y: 20, opacity: 0, duration: 0.85 }, "-=0.75")
       .from(".hero__scroll", { opacity: 0, duration: 0.6 }, "-=0.5");
 
     const drift = document.querySelector(".js-drift img");
     if (drift) {
-      gsap.fromTo(drift, { scale: 1.1 }, {
-        scale: 1,
+      gsap.fromTo(drift, { yPercent: -5, scale: 1.12 }, {
+        yPercent: 5,
+        scale: 1.12,
         ease: "none",
         scrollTrigger: {
           trigger: ".js-drift",
           start: "top bottom",
           end: "bottom top",
-          scrub: true
+          scrub: 0.6
         }
       });
     }
+
+    const slideIn = (selector, trigger) => {
+      const items = gsap.utils.toArray(selector);
+      if (!items.length) return;
+      gsap.from(items, {
+        x: -22,
+        opacity: 0.4,
+        duration: 0.9,
+        stagger: 0.08,
+        ease: "expo.out",
+        scrollTrigger: { trigger, start: "top 82%", once: true }
+      });
+    };
+    slideIn(".service-list > li", ".service-list");
+    slideIn(".steps > li", ".steps");
+
+    gsap.from(".gateway-gallery img", {
+      scale: 1.12,
+      duration: 1.2,
+      stagger: 0.09,
+      ease: "expo.out",
+      clearProps: "transform",
+      scrollTrigger: { trigger: ".gateway-gallery", start: "top 85%", once: true }
+    });
+
+    const routePath = document.querySelector(".showcase__routePath");
+    if (routePath) {
+      const routeLength = routePath.getTotalLength();
+      const pinStage = window.matchMedia("(min-width: 901px)").matches;
+      gsap.set(routePath, { strokeDasharray: routeLength, strokeDashoffset: routeLength });
+      gsap.set(".showcase__leaf", { opacity: 0, scale: 0.35, transformOrigin: "center" });
+      const routeTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".showcase__stage",
+          start: pinStage ? "top 16%" : "top 82%",
+          end: pinStage ? "+=70%" : "bottom 18%",
+          scrub: 0.6,
+          pin: pinStage,
+          anticipatePin: 1
+        }
+      });
+      routeTimeline
+        .to(routePath, { strokeDashoffset: 0, ease: "none", duration: 1 })
+        .to(".showcase__leaf", { opacity: 1, scale: 1, duration: 0.02, ease: "power2.out" }, 0.98);
+    }
+
+    gsap.from(".footer__word", {
+      yPercent: 16,
+      opacity: 0.35,
+      duration: 1.1,
+      ease: "expo.out",
+      scrollTrigger: { trigger: ".footer", start: "top 78%", once: true }
+    });
 
     document.querySelectorAll("[data-reveal]").forEach((element) => {
       gsap.from(element, {
