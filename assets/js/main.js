@@ -262,6 +262,47 @@
     }, 1400);
   });
 
+  /* Ship sailing the Đi → Đến route: viewBox is 1200x80, stretched to the box */
+  const routePath = document.querySelector(".showcase__routePath");
+  const routeShip = document.getElementById("routeShip");
+  const routeBox = document.querySelector(".showcase__route");
+  const routeLength = routePath ? routePath.getTotalLength() : 0;
+  let shipScaleX = 1;
+  let shipScaleY = 1;
+  let shipProgress = 0;
+
+  const measureRoute = () => {
+    if (!routeBox) return;
+    const rect = routeBox.getBoundingClientRect();
+    shipScaleX = rect.width / 1200;
+    shipScaleY = rect.height / 80;
+  };
+
+  const placeShip = (progress) => {
+    if (!routePath || !routeShip) return;
+    shipProgress = Math.min(1, Math.max(0, progress));
+    const point = routePath.getPointAtLength(routeLength * shipProgress);
+    const ahead = routePath.getPointAtLength(Math.min(routeLength, routeLength * shipProgress + 6));
+    const angle = (Math.atan2((ahead.y - point.y) * shipScaleY, (ahead.x - point.x) * shipScaleX) * 180) / Math.PI;
+    routeShip.style.setProperty("--ship-x", `${point.x * shipScaleX}px`);
+    routeShip.style.setProperty("--ship-y", `${point.y * shipScaleY}px`);
+    routeShip.style.setProperty("--ship-rot", `${angle}deg`);
+    routeShip.style.opacity = "1";
+  };
+
+  if (routePath && routeShip) {
+    measureRoute();
+    placeShip(0);
+    window.addEventListener("resize", () => {
+      measureRoute();
+      placeShip(shipProgress);
+    });
+    window.addEventListener("load", () => {
+      measureRoute();
+      placeShip(shipProgress);
+    });
+  }
+
   /* Motion */
   if (hasGsap && !reduceMotion) {
     gsap.registerPlugin(ScrollTrigger);
@@ -281,8 +322,8 @@
       if (!words.length) return;
       gsap.from(words, {
         yPercent: 115,
-        duration: 0.95,
-        stagger: 0.035,
+        duration: 0.75,
+        stagger: 0.03,
         ease: "expo.out",
         scrollTrigger: { trigger: heading, start: "top 88%", once: true }
       });
@@ -292,7 +333,6 @@
     intro
       .from(".brand, .nav a, .head-cta, .menu-btn", { y: -14, opacity: 0, duration: 0.7, stagger: 0.05 }, 0)
       .from(".hero__title", { y: 48, opacity: 0, duration: 1.2 }, 0.15)
-      .from(".hero__ports", { y: 14, opacity: 0, duration: 0.8 }, 0.85)
       .from(".hero__lead", { y: 20, opacity: 0, duration: 0.85 }, 0.95)
       .from(".hero__scroll", { opacity: 0, duration: 0.6 }, 1.2);
 
@@ -303,7 +343,7 @@
       immediateRender: false,
       scrollTrigger: { start: 0, end: () => window.innerHeight, scrub: 0.6 }
     });
-    gsap.to(".hero__lead, .hero__scroll, .hero__ports", {
+    gsap.to(".hero__lead, .hero__scroll", {
       y: -24,
       opacity: 0,
       ease: "none",
@@ -379,17 +419,7 @@
       scrollTrigger: { trigger: ".gateway-gallery", start: "top 85%", once: true }
     });
 
-    const marqueeA = document.getElementById("marqueeA");
-    const marqueeB = document.getElementById("marqueeB");
-    if (marqueeA) gsap.to(marqueeA, { xPercent: -50, duration: 38, ease: "none", repeat: -1 });
-    if (marqueeB) {
-      gsap.set(marqueeB, { xPercent: -50 });
-      gsap.to(marqueeB, { xPercent: 0, duration: 46, ease: "none", repeat: -1 });
-    }
-
-    const routePath = document.querySelector(".showcase__routePath");
     if (routePath) {
-      const routeLength = routePath.getTotalLength();
       const pinStage = window.matchMedia("(min-width: 901px)").matches;
       gsap.set(routePath, { strokeDasharray: routeLength, strokeDashoffset: routeLength });
       gsap.set(".showcase__leaf", { opacity: 0, scale: 0.35, transformOrigin: "center" });
@@ -406,15 +436,14 @@
       routeTimeline
         .to(routePath, { strokeDashoffset: 0, ease: "none", duration: 1 })
         .to(".showcase__leaf", { opacity: 1, scale: 1, duration: 0.02, ease: "power2.out" }, 0.98);
-      const containerMarker = document.querySelector(".showcase__container");
-      if (containerMarker) {
-        const updateMarker = () => {
+      if (routeShip) {
+        const updateShip = () => {
           const progress = routeTimeline.scrollTrigger ? routeTimeline.scrollTrigger.progress : 0;
-          const point = routePath.getPointAtLength(routeLength * Math.min(1, Math.max(0, progress)));
-          containerMarker.setAttribute("transform", `translate(${point.x} ${point.y})`);
+          // stop short of the end so the arrival leaf stays readable beside the hull
+          placeShip(progress * 0.95);
         };
-        routeTimeline.eventCallback("onUpdate", updateMarker);
-        updateMarker();
+        routeTimeline.eventCallback("onUpdate", updateShip);
+        updateShip();
       }
     }
 

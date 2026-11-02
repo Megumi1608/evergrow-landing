@@ -267,25 +267,6 @@ button { cursor: pointer; }
 .hero__layer--ink { clip-path: inset(0 0 25% 0); }
 .hero__layer--white { color: #fff; clip-path: inset(75% 0 0 0); }
 
-.hero__ports {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 112px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px 24px;
-  flex-wrap: wrap;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: var(--step-small);
-  line-height: 1.4;
-}
-.hero__ports span + span::before {
-  content: "·";
-  margin-right: 24px;
-  color: rgba(255, 255, 255, 0.42);
-}
-
 .hero__bottom {
   position: absolute;
   left: 0;
@@ -320,7 +301,6 @@ button { cursor: pointer; }
 /* Shared section layout */
 
 .section { padding-block: clamp(88px, 10vw, 150px); }
-.section--tight { padding-block: clamp(88px, 10vw, 140px) clamp(64px, 7vw, 96px); }
 .section--paper { background: var(--paper-2); }
 .section--green { background: var(--green); color: #fff; }
 
@@ -464,31 +444,6 @@ h3 {
 .service:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
 .service:hover .service__mode,
 .service:focus-visible .service__mode { color: rgba(255, 255, 255, 0.78); }
-
-/* Destinations marquee */
-
-.destinations { background: var(--paper); }
-.destinations .split { margin-bottom: clamp(40px, 5vw, 64px); }
-.marquee { overflow: hidden; padding-block: 8px 0; }
-.marquee__row { overflow: hidden; }
-.marquee__row--a { padding-block: 8px 0; }
-.marquee__row--b { padding-block: 10px 0; }
-.marquee__track { display: flex; width: max-content; will-change: transform; }
-.marquee__group {
-  display: block;
-  padding-right: 0.9em;
-  color: var(--green);
-  font-size: clamp(2.6rem, 6.8vw, 6.4rem);
-  font-weight: 600;
-  line-height: 1.06;
-  letter-spacing: -0.05em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.marquee__row--b .marquee__group {
-  color: var(--ink);
-  font-size: clamp(1.7rem, 4.2vw, 3.9rem);
-}
 
 /* Route explorer */
 
@@ -643,20 +598,43 @@ h3 {
 
 /* Showcase: Đi / Đến */
 
-.showcase .split { margin-bottom: clamp(48px, 7vw, 92px); }
-.showcase__stage { position: relative; }
+.showcase .split { margin-bottom: clamp(38px, 6vw, 82px); }
+.showcase__stage {
+  position: relative;
+  padding-block: 10px;
+  background: var(--paper);
+}
 .showcase__pair {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(20px, 4vw, 56px);
 }
 .showcase__route {
+  position: relative;
   margin-top: clamp(18px, 2.6vw, 30px);
 }
-.showcase__route svg {
+.showcase__route > svg {
   display: block;
   width: 100%;
   height: clamp(42px, 5.5vw, 80px);
+  overflow: visible;
+}
+.showcase__ship {
+  --ship-x: 0px;
+  --ship-y: 0px;
+  --ship-rot: 0deg;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(42px, 4.8vw, 68px);
+  opacity: 0;
+  transform: translate(calc(var(--ship-x) - 50%), calc(var(--ship-y) - 88%)) rotate(var(--ship-rot));
+  will-change: transform;
+}
+.showcase__ship svg {
+  display: block;
+  width: 100%;
+  height: auto;
   overflow: visible;
 }
 .showcase__cap {
@@ -1035,14 +1013,6 @@ h3 {
   .hero { min-height: max(100svh, 620px); }
   .hero__title { line-height: 1.28; top: calc(50% - 1.92em); }
   .hero__bottom { bottom: 26px; }
-  .hero__ports {
-    bottom: 108px;
-    gap: 6px 14px;
-    justify-content: flex-start;
-    font-size: 0.8125rem;
-    max-width: 100%;
-  }
-  .hero__ports span + span::before { display: none; }
   .hero__lead { max-width: 30ch; }
   .hero__scroll { display: none; }
 

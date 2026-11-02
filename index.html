@@ -18,7 +18,7 @@
   <link rel="preload" href="assets/fonts/QdVMSTAyLFyeg_IDWvOJmVES_HToIW81Rb0.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/QdVMSTAyLFyeg_IDWvOJmVES_HToIW86Rb0bcw.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/fonts/fonts.css">
-  <link rel="stylesheet" href="assets/css/styles.css?v=3">
+  <link rel="stylesheet" href="assets/css/styles.css?v=8">
 </head>
 <body>
   <a class="skip" href="#main">Bỏ qua điều hướng</a>
@@ -72,9 +72,6 @@
           <span class="hero__layer hero__layer--white" aria-hidden="true">Việt Nam<br>Ra thế giới</span>
         </h1>
       </div>
-      <p class="container hero__ports" aria-label="Cửa ngõ thường dùng: Hải Phòng, Cái Mép, Cát Lái, Nội Bài, Tân Sơn Nhất, Hữu Nghị">
-        <span>Hải Phòng</span><span>Cái Mép</span><span>Cát Lái</span><span>Nội Bài</span><span>Tân Sơn Nhất</span><span>Hữu Nghị</span>
-      </p>
       <div class="container hero__bottom">
         <p class="hero__lead">Forwarder Việt Nam: biển, hàng không, đường bộ và hải quan. Một đầu mối từ kho đến kho.</p>
         <a class="hero__scroll" href="#gioi-thieu">
@@ -164,33 +161,6 @@
           </li>
         </ul>
       </div>
-    </section>
-
-    <section class="destinations section section--tight" id="diem-den" aria-labelledby="dest-title">
-      <div class="container">
-        <div class="split" data-reveal-group>
-          <h2 id="dest-title" data-reveal-item>Từ Việt Nam, đi khắp.</h2>
-          <div class="split__copy" data-reveal-item>
-            <p class="body">Các cảng dưới đây là những điểm đến quen thuộc. Bạn không phải tự ghép hãng tàu, hãng bay và đại lý ở từng đầu.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="marquee" aria-hidden="true">
-        <div class="marquee__row marquee__row--a">
-          <div class="marquee__track" id="marqueeA">
-            <span class="marquee__group">Rotterdam · Hamburg · Los Angeles · New York · Singapore · Tokyo · Busan · Jebel Ali · Sydney · Thượng Hải · Melbourne · Antwerp · </span>
-            <span class="marquee__group">Rotterdam · Hamburg · Los Angeles · New York · Singapore · Tokyo · Busan · Jebel Ali · Sydney · Thượng Hải · Melbourne · Antwerp · </span>
-          </div>
-        </div>
-        <div class="marquee__row marquee__row--b">
-          <div class="marquee__track" id="marqueeB">
-            <span class="marquee__group">Laem Chabang · Port Klang · Hong Kong · Kaohsiung · Incheon · Kobe · Genoa · Valencia · Felixstowe · Le Havre · Auckland · Tanjung Pelepas · </span>
-            <span class="marquee__group">Laem Chabang · Port Klang · Hong Kong · Kaohsiung · Incheon · Kobe · Genoa · Valencia · Felixstowe · Le Havre · Auckland · Tanjung Pelepas · </span>
-          </div>
-        </div>
-      </div>
-      <p class="visually-hidden">Các cảng đến thường xuyên: Rotterdam, Hamburg, Los Angeles, New York, Singapore, Tokyo, Busan, Jebel Ali, Sydney, Thượng Hải, Melbourne, Antwerp, Laem Chabang, Port Klang, Hong Kong, Kaohsiung, Incheon, Kobe, Genoa, Valencia, Felixstowe, Le Havre, Auckland, Tanjung Pelepas.</p>
     </section>
 
     <section class="explorer section section--green" id="tuyen" aria-labelledby="route-title">
@@ -317,9 +287,16 @@
             <svg viewBox="0 0 1200 80" preserveAspectRatio="none">
               <path class="showcase__routePath" d="M12 58C266 58 306 22 600 22S936 58 1188 58" fill="none" stroke="#0b6b4a" stroke-width="2.5" stroke-linecap="round"/>
               <circle cx="12" cy="58" r="4.5" fill="#0b6b4a"/>
-              <g class="showcase__container" transform="translate(12 58)"><rect x="-5" y="-5" width="10" height="10" fill="#0b6b4a"/><rect x="-2" y="-2" width="4" height="4" fill="#fff"/></g>
               <g class="showcase__leaf"><path d="M1188 58c-13-11-11-25 3-27 8 10 8 19-3 27Z" fill="#0b6b4a"/></g>
             </svg>
+            <div class="showcase__ship" id="routeShip">
+              <svg viewBox="0 0 44 26">
+                <rect x="4" y="3" width="6" height="12" fill="#0b6b4a"/>
+                <rect x="12" y="6" width="25" height="9" fill="#0b6b4a"/>
+                <path d="M12 10.5h25M18 6v9M24.5 6v9M31 6v9" stroke="#fff" stroke-width="1.3"/>
+                <path d="M2 15h40l-6 8H9Z" fill="#0b6b4a"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -615,6 +592,6 @@
 
   <script src="assets/vendor/gsap.min.js" defer></script>
   <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-  <script src="assets/js/main.js?v=3" defer></script>
+  <script src="assets/js/main.js?v=8" defer></script>
 </body>
 </html>
