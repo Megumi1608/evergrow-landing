@@ -1,5 +1,16 @@
 (() => {
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let storedMotion = null;
+  try { storedMotion = window.localStorage.getItem("evergrow-motion"); } catch (error) { storedMotion = null; }
+  const reduceMotion = storedMotion ? storedMotion === "off" : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const motionToggle = document.getElementById("motionToggle");
+  if (motionToggle) {
+    motionToggle.textContent = `Chuyển động: ${reduceMotion ? "tắt" : "bật"}`;
+    motionToggle.setAttribute("aria-pressed", String(!reduceMotion));
+    motionToggle.addEventListener("click", () => {
+      try { window.localStorage.setItem("evergrow-motion", reduceMotion ? "on" : "off"); } catch (error) {}
+      window.location.reload();
+    });
+  }
   const hasGsap = Boolean(window.gsap && window.ScrollTrigger);
   const head = document.getElementById("siteHead");
   const menuBtn = document.getElementById("menuBtn");
@@ -31,6 +42,24 @@
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && menuOpen) setMenu(false);
+  });
+
+  function scrollToTarget(target) {
+    if (!target) return;
+    target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    if (link.classList.contains("skip")) return;
+    link.addEventListener("click", (event) => {
+      const href = link.getAttribute("href");
+      if (!href || href.length < 2) return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      event.preventDefault();
+      scrollToTarget(target);
+      if (window.history && history.pushState) history.pushState(null, "", href);
+    });
   });
 
   /* Service rows prefill the quote note */
@@ -204,7 +233,7 @@
     routeField.value = `${lastPlan.origin.label} → ${lastPlan.destination.port}, ${lastPlan.destination.label}`;
     if (cargoSelect) cargoSelect.value = state.commodity;
     if (formStatus) formStatus.textContent = "Đã điền tuyến. Kiểm tra thông tin và gửi yêu cầu.";
-    document.getElementById("lien-he").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    scrollToTarget(document.getElementById("lien-he"));
     window.setTimeout(() => routeField.focus({ preventScroll: true }), reduceMotion ? 0 : 650);
   });
 
@@ -237,11 +266,50 @@
   if (hasGsap && !reduceMotion) {
     gsap.registerPlugin(ScrollTrigger);
 
+    const splitHeading = (heading) => {
+      if (heading.dataset.split === "true") return [];
+      const words = heading.textContent.trim().split(/\s+/);
+      heading.innerHTML = words
+        .map((word) => `<span class="split-word"><span class="split-word__inner">${word}</span></span>`)
+        .join(" ");
+      heading.dataset.split = "true";
+      return heading.querySelectorAll(".split-word__inner");
+    };
+
+    document.querySelectorAll("h2, .step__title").forEach((heading) => {
+      const words = splitHeading(heading);
+      if (!words.length) return;
+      gsap.from(words, {
+        yPercent: 115,
+        duration: 0.95,
+        stagger: 0.035,
+        ease: "expo.out",
+        scrollTrigger: { trigger: heading, start: "top 88%", once: true }
+      });
+    });
+
     const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
     intro
-      .from(".hero__title", { y: 44, opacity: 0, duration: 1.25, delay: 0.08 })
-      .from(".hero__lead", { y: 20, opacity: 0, duration: 0.85 }, "-=0.75")
-      .from(".hero__scroll", { opacity: 0, duration: 0.6 }, "-=0.5");
+      .from(".brand, .nav a, .head-cta, .menu-btn", { y: -14, opacity: 0, duration: 0.7, stagger: 0.05 }, 0)
+      .from(".hero__title", { y: 48, opacity: 0, duration: 1.2 }, 0.15)
+      .from(".hero__ports", { y: 14, opacity: 0, duration: 0.8 }, 0.85)
+      .from(".hero__lead", { y: 20, opacity: 0, duration: 0.85 }, 0.95)
+      .from(".hero__scroll", { opacity: 0, duration: 0.6 }, 1.2);
+
+    gsap.to(".hero__title", {
+      yPercent: -16,
+      scale: 0.96,
+      ease: "none",
+      immediateRender: false,
+      scrollTrigger: { start: 0, end: () => window.innerHeight, scrub: 0.6 }
+    });
+    gsap.to(".hero__lead, .hero__scroll, .hero__ports", {
+      y: -24,
+      opacity: 0,
+      ease: "none",
+      immediateRender: false,
+      scrollTrigger: { start: 0, end: () => window.innerHeight, scrub: 0.6 }
+    });
 
     const drift = document.querySelector(".js-drift img");
     if (drift) {
@@ -249,14 +317,36 @@
         yPercent: 5,
         scale: 1.12,
         ease: "none",
-        scrollTrigger: {
-          trigger: ".js-drift",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.6
-        }
+        scrollTrigger: { trigger: ".js-drift", start: "top bottom", end: "bottom top", scrub: 0.6 }
+      });
+      gsap.fromTo(".js-drift .figure__frame", { clipPath: "inset(10% 0 10% 0)" }, {
+        clipPath: "inset(0% 0 0% 0)",
+        duration: 1.3,
+        ease: "expo.out",
+        scrollTrigger: { trigger: ".js-drift", start: "top 82%", once: true }
       });
     }
+
+    document.querySelectorAll(".figure__frame img").forEach((image) => {
+      if (image.closest(".js-drift")) return;
+      gsap.from(image, {
+        scale: 1.06,
+        duration: 1.2,
+        ease: "expo.out",
+        clearProps: "transform",
+        scrollTrigger: { trigger: image.closest("figure"), start: "top 85%", once: true }
+      });
+    });
+
+    document.querySelectorAll(".figure__cap").forEach((caption) => {
+      gsap.from(caption, {
+        y: 14,
+        opacity: 0,
+        duration: 0.7,
+        ease: "power2.out",
+        scrollTrigger: { trigger: caption, start: "top 92%", once: true }
+      });
+    });
 
     const slideIn = (selector, trigger) => {
       const items = gsap.utils.toArray(selector);
@@ -273,6 +363,13 @@
     slideIn(".service-list > li", ".service-list");
     slideIn(".steps > li", ".steps");
 
+    gsap.from(".gateway-gallery figure", {
+      clipPath: "inset(0 0 20% 0)",
+      duration: 1.05,
+      stagger: 0.1,
+      ease: "expo.out",
+      scrollTrigger: { trigger: ".gateway-gallery", start: "top 85%", once: true }
+    });
     gsap.from(".gateway-gallery img", {
       scale: 1.12,
       duration: 1.2,
@@ -281,6 +378,14 @@
       clearProps: "transform",
       scrollTrigger: { trigger: ".gateway-gallery", start: "top 85%", once: true }
     });
+
+    const marqueeA = document.getElementById("marqueeA");
+    const marqueeB = document.getElementById("marqueeB");
+    if (marqueeA) gsap.to(marqueeA, { xPercent: -50, duration: 38, ease: "none", repeat: -1 });
+    if (marqueeB) {
+      gsap.set(marqueeB, { xPercent: -50 });
+      gsap.to(marqueeB, { xPercent: 0, duration: 46, ease: "none", repeat: -1 });
+    }
 
     const routePath = document.querySelector(".showcase__routePath");
     if (routePath) {
@@ -301,12 +406,48 @@
       routeTimeline
         .to(routePath, { strokeDashoffset: 0, ease: "none", duration: 1 })
         .to(".showcase__leaf", { opacity: 1, scale: 1, duration: 0.02, ease: "power2.out" }, 0.98);
+      const containerMarker = document.querySelector(".showcase__container");
+      if (containerMarker) {
+        const updateMarker = () => {
+          const progress = routeTimeline.scrollTrigger ? routeTimeline.scrollTrigger.progress : 0;
+          const point = routePath.getPointAtLength(routeLength * Math.min(1, Math.max(0, progress)));
+          containerMarker.setAttribute("transform", `translate(${point.x} ${point.y})`);
+        };
+        routeTimeline.eventCallback("onUpdate", updateMarker);
+        updateMarker();
+      }
     }
 
+    document.querySelectorAll(".qa").forEach((item) => {
+      gsap.from(item, {
+        y: 18,
+        opacity: 0.55,
+        duration: 0.7,
+        ease: "power2.out",
+        scrollTrigger: { trigger: item, start: "top 92%", once: true }
+      });
+    });
+
+    gsap.from(".contact__info", {
+      y: 26,
+      opacity: 0.4,
+      duration: 0.9,
+      ease: "expo.out",
+      scrollTrigger: { trigger: ".contact__grid", start: "top 85%", once: true }
+    });
+    gsap.from(".quote", {
+      y: 40,
+      opacity: 0.5,
+      duration: 1,
+      ease: "expo.out",
+      scrollTrigger: { trigger: ".contact__grid", start: "top 85%", once: true }
+    });
+
     gsap.from(".footer__word", {
-      yPercent: 16,
+      yPercent: 22,
+      scale: 0.94,
       opacity: 0.35,
-      duration: 1.1,
+      duration: 1.15,
       ease: "expo.out",
       scrollTrigger: { trigger: ".footer", start: "top 78%", once: true }
     });
@@ -322,7 +463,7 @@
     });
 
     document.querySelectorAll("[data-reveal-group]").forEach((group) => {
-      const items = group.querySelectorAll(":scope > [data-reveal-item]");
+      const items = group.querySelectorAll(":scope > [data-reveal-item]:not(h2)");
       if (!items.length) return;
       gsap.from(items, {
         y: 24,
@@ -333,5 +474,8 @@
         scrollTrigger: { trigger: group, start: "top 88%", once: true }
       });
     });
+
+    window.addEventListener("load", () => ScrollTrigger.refresh());
+    window.setTimeout(() => ScrollTrigger.refresh(), 1000);
   }
 })();

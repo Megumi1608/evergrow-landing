@@ -33,7 +33,8 @@ favicon.svg
 ## Tính năng
 
 - Hero waterline: chữ chuyển từ mực sang trắng khi cắt qua nền xanh.
-- Scroll scene ĐI → ĐẾN: stage được pin, route line vẽ dần theo scroll; ảnh Tân Vũ parallax; wordmark footer đi lên khi vào khung.
+- Scroll scene ĐI → ĐẾN: stage được pin, route line vẽ dần theo scroll, container xanh chạy dọc tuyến; ảnh Tân Vũ parallax; wordmark footer đi lên khi vào khung.
+- Marquee điểm đến hai chiều, heading reveal theo từ, ảnh cửa ngõ mở bằng clip và scale, service rows có wipe xanh khi hover.
 - Bộ chọn tuyến: hàng hoá, cửa ngõ, điểm đến → gợi ý phương thức, chứng từ, thời gian tham khảo và điền sẵn vào form báo giá.
 - Danh sách dịch vụ, sáu cửa ngõ, quy trình bốn bước, FAQ dạng đọc.
 - Form báo giá mở ứng dụng email với nội dung đã điền sẵn (không có backend).
