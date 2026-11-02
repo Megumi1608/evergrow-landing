@@ -1,0 +1,283 @@
+(() => {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hasGsap = Boolean(window.gsap && window.ScrollTrigger);
+  const head = document.getElementById("siteHead");
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+
+  /* Header */
+  /* Mobile menu */
+  let menuOpen = false;
+  function setMenu(open, restoreFocus = true) {
+    menuOpen = open;
+    mobileMenu.classList.toggle("is-open", open);
+    menuBtn.classList.toggle("is-open", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Đóng menu" : "Mở menu");
+    mobileMenu.setAttribute("aria-hidden", String(!open));
+    head.classList.toggle("is-menu-open", open);
+    document.body.style.overflow = open ? "hidden" : "";
+    mobileMenu.inert = !open;
+    if (open) {
+      window.setTimeout(() => mobileMenu.querySelector("a").focus(), 60);
+    } else if (restoreFocus) {
+      menuBtn.focus();
+    }
+  }
+  mobileMenu.inert = true;
+  menuBtn.addEventListener("click", () => setMenu(!menuOpen));
+  mobileMenu.addEventListener("click", (event) => {
+    if (event.target.closest("a")) setMenu(false, false);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuOpen) setMenu(false);
+  });
+
+  /* Service rows prefill the quote note */
+  const noteField = document.getElementById("note");
+  document.querySelectorAll("[data-service]").forEach((link) => {
+    link.addEventListener("click", () => {
+      if (!noteField) return;
+      const line = `Cần báo giá: ${link.dataset.service}.`;
+      if (!noteField.value.includes(line)) {
+        noteField.value = `${line}\n${noteField.value}`.trim();
+      }
+    });
+  });
+
+  /* Route finder */
+  const origins = {
+    hp: { label: "Hải Phòng", mode: "sea" },
+    cm: { label: "Cái Mép", mode: "sea" },
+    cl: { label: "Cát Lái", mode: "sea" },
+    nb: { label: "Nội Bài", mode: "air" },
+    tsn: { label: "Tân Sơn Nhất", mode: "air" },
+    hn: { label: "Hữu Nghị", mode: "road" }
+  };
+
+  const destinations = {
+    cn: { label: "Trung Quốc", port: "Thượng Hải", time: { sea: "5–8 ngày", air: "1–2 ngày", road: "2–4 ngày" } },
+    asean: { label: "ASEAN", port: "Singapore", time: { sea: "5–10 ngày", air: "1–3 ngày", road: "3–7 ngày" } },
+    jp: { label: "Nhật Bản", port: "Tokyo", time: { sea: "6–10 ngày", air: "1–2 ngày", road: "Không áp dụng" } },
+    kr: { label: "Hàn Quốc", port: "Busan", time: { sea: "5–9 ngày", air: "1–2 ngày", road: "Không áp dụng" } },
+    eu: { label: "EU", port: "Rotterdam", time: { sea: "30–38 ngày", air: "2–4 ngày", road: "Không áp dụng" } },
+    us: { label: "Hoa Kỳ", port: "Los Angeles", time: { sea: "24–40 ngày", air: "2–4 ngày", road: "Không áp dụng" } },
+    me: { label: "Trung Đông", port: "Jebel Ali", time: { sea: "16–24 ngày", air: "2–4 ngày", road: "Không áp dụng" } },
+    au: { label: "Úc", port: "Sydney", time: { sea: "14–22 ngày", air: "2–4 ngày", road: "Không áp dụng" } }
+  };
+
+  const commodityLabels = {
+    electronics: "Điện tử",
+    garment: "Dệt may",
+    agri: "Nông sản",
+    machinery: "Máy móc"
+  };
+
+  const reasons = {
+    air: "Hàng gấp hoặc giá trị cao nên đi hàng không. Evergrow giữ chỗ theo chuyến bay và khai trước khi hàng đến sân bay.",
+    road: "Đường bộ qua cửa khẩu phù hợp hàng đi Trung Quốc và ASEAN. Kiểm tra loại hàng và giấy phép trước khi đóng xe.",
+    roadsea: "Hàng đi đường bộ sang Trung Quốc rồi chuyển tàu tại cảng đầu tiên. Evergrow ghép hai chặng dưới một booking.",
+    sea: "Đường biển phù hợp lô hàng lớn và không gấp. Evergrow giữ chỗ FCL hoặc ghép LCL tại cảng khởi hành."
+  };
+
+  const cargoNotes = {
+    electronics: "Hàng điện tử cần đóng gói chống ẩm và kiểm tra chứng nhận hợp quy nếu có.",
+    garment: "Hàng dệt may cần đối chiếu số lượng, mã HS và nhãn xuất xứ trước khi khai.",
+    agri: "Nông sản cần kiểm dịch thực vật và điều kiện nhiệt độ phù hợp; Evergrow xác nhận với hãng trước khi đặt chỗ.",
+    machinery: "Máy móc có thể cần flat rack hoặc open top nếu vượt kích thước container."
+  };
+
+  const modeLabels = {
+    sea: "Đường biển · FCL",
+    air: "Hàng không · AWB",
+    road: "Đường bộ · xe tải",
+    roadsea: "Đường bộ + đường biển"
+  };
+
+  const state = { commodity: "electronics", origin: "hp", destination: "eu" };
+  const result = document.getElementById("result");
+  const resultMode = document.getElementById("resultMode");
+  const resultTime = document.getElementById("resultTime");
+  const resultWhy = document.getElementById("resultWhy");
+  const resultDocs = document.getElementById("resultDocs");
+  const routeOrigin = document.getElementById("routeOrigin");
+  const routeDest = document.getElementById("routeDest");
+  const originSelect = document.getElementById("origin");
+  const destinationSelect = document.getElementById("destination");
+  const commodityButtons = document.querySelectorAll("[data-commodity]");
+  const routeLine = document.getElementById("routeLine");
+
+  function buildPlan() {
+    const origin = origins[state.origin];
+    const destination = destinations[state.destination];
+    let mode = "sea";
+    if (origin.mode === "air") mode = "air";
+    if (origin.mode === "road") {
+      mode = state.destination === "cn" || state.destination === "asean" ? "road" : "roadsea";
+    }
+
+    const timeKey = mode === "roadsea" ? "sea" : mode;
+    let time = destination.time[timeKey];
+    if (mode === "roadsea") time = `~3 ngày + ${destination.time.sea}`;
+
+    const transportDoc = mode === "air"
+      ? "Vận đơn hàng không (AWB)"
+      : mode === "road"
+        ? "Giấy vận chuyển đường bộ"
+        : "Vận đơn (B/L)";
+
+    const docs = ["Hóa đơn thương mại", "Packing list", transportDoc, "Tờ khai hải quan"];
+
+    if (state.destination === "eu") docs.push("C/O EUR.1");
+    if (state.destination === "cn" || state.destination === "asean") docs.push("C/O ưu đãi (nếu có)");
+    if (state.destination === "us") docs.push("C/O và thông tin FDA (nếu có)");
+    if (state.commodity === "agri") docs.push("Giấy kiểm dịch thực vật");
+    if (state.commodity === "electronics") docs.push("Chứng nhận hợp quy (nếu có)");
+    if (state.commodity === "machinery") docs.push("Catalogue và thông số kỹ thuật");
+
+    return {
+      origin,
+      destination,
+      mode,
+      time,
+      docs: docs.slice(0, 6),
+      why: `${reasons[mode]} ${cargoNotes[state.commodity]}`
+    };
+  }
+
+  let lastPlan = null;
+
+  function renderPlan(animate) {
+    const plan = buildPlan();
+    resultMode.textContent = modeLabels[plan.mode];
+    resultTime.textContent = plan.time;
+    resultWhy.textContent = plan.why;
+    routeOrigin.textContent = plan.origin.label;
+    routeDest.textContent = `${plan.destination.port}, ${plan.destination.label}`;
+    resultDocs.replaceChildren(...plan.docs.map((doc) => {
+      const li = document.createElement("li");
+      li.textContent = doc;
+      return li;
+    }));
+
+    if (animate && hasGsap && !reduceMotion) {
+      gsap.fromTo(result, { opacity: 0.55, y: 7 }, { opacity: 1, y: 0, duration: 0.34, ease: "power2.out" });
+      if (routeLine) {
+        const length = routeLine.getTotalLength();
+        routeLine.style.strokeDasharray = String(length);
+        routeLine.style.strokeDashoffset = String(length);
+        gsap.to(routeLine, { strokeDashoffset: 0, duration: 0.7, ease: "power3.out", clearProps: "strokeDasharray,strokeDashoffset" });
+      }
+    }
+    lastPlan = plan;
+  }
+
+  commodityButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.commodity = button.dataset.commodity;
+      commodityButtons.forEach((other) => {
+        const active = other === button;
+        other.classList.toggle("is-active", active);
+        other.setAttribute("aria-pressed", String(active));
+      });
+      renderPlan(true);
+    });
+  });
+
+  originSelect.addEventListener("change", () => {
+    state.origin = originSelect.value;
+    renderPlan(true);
+  });
+  destinationSelect.addEventListener("change", () => {
+    state.destination = destinationSelect.value;
+    renderPlan(true);
+  });
+
+  renderPlan(false);
+
+  /* Send the chosen route into the quote form */
+  const routeField = document.getElementById("route");
+  const cargoSelect = document.getElementById("cargo");
+  const formStatus = document.getElementById("formStatus");
+  document.getElementById("useRoute").addEventListener("click", () => {
+    if (!lastPlan) renderPlan(false);
+    routeField.value = `${lastPlan.origin.label} → ${lastPlan.destination.port}, ${lastPlan.destination.label}`;
+    if (cargoSelect) cargoSelect.value = state.commodity;
+    if (formStatus) formStatus.textContent = "Đã điền tuyến. Kiểm tra thông tin và gửi yêu cầu.";
+    document.getElementById("lien-he").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    window.setTimeout(() => routeField.focus({ preventScroll: true }), reduceMotion ? 0 : 650);
+  });
+
+  /* Quote form: opens the visitor's mail client with the message filled in */
+  const quoteForm = document.getElementById("quoteForm");
+  quoteForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(quoteForm);
+    const lines = [
+      `Tên: ${data.get("name") || ""}`,
+      `Công ty: ${data.get("company") || ""}`,
+      `Email: ${data.get("email") || ""}`,
+      `Điện thoại: ${data.get("phone") || ""}`,
+      `Tuyến: ${data.get("route") || ""}`,
+      `Loại hàng: ${commodityLabels[data.get("cargo")] || data.get("cargo") || ""}`,
+      "",
+      "Ghi chú:",
+      data.get("note") || ""
+    ];
+    const subject = `Yêu cầu báo giá: ${data.get("route") || "tuyến mới"}`;
+    const href = `mailto:hello@evergrow.vn?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+    formStatus.textContent = "Đang mở ứng dụng email của bạn…";
+    window.location.href = href;
+    window.setTimeout(() => {
+      formStatus.textContent = "Nếu ứng dụng email không mở, viết trực tiếp tới hello@evergrow.vn.";
+    }, 1400);
+  });
+
+  /* Motion */
+  if (hasGsap && !reduceMotion) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+    intro
+      .from(".hero__title", { y: 28, opacity: 0, duration: 1.15, delay: 0.08 })
+      .from(".hero__lead", { y: 18, opacity: 0, duration: 0.8 }, "-=0.7")
+      .from(".hero__scroll", { opacity: 0, duration: 0.6 }, "-=0.5");
+
+    const drift = document.querySelector(".js-drift img");
+    if (drift) {
+      gsap.fromTo(drift, { scale: 1.1 }, {
+        scale: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".js-drift",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true
+        }
+      });
+    }
+
+    document.querySelectorAll("[data-reveal]").forEach((element) => {
+      gsap.from(element, {
+        y: 26,
+        opacity: 0.45,
+        duration: 0.85,
+        ease: "power3.out",
+        scrollTrigger: { trigger: element, start: "top 88%", once: true }
+      });
+    });
+
+    document.querySelectorAll("[data-reveal-group]").forEach((group) => {
+      const items = group.querySelectorAll(":scope > [data-reveal-item]");
+      if (!items.length) return;
+      gsap.from(items, {
+        y: 24,
+        opacity: 0.45,
+        duration: 0.78,
+        stagger: 0.07,
+        ease: "power3.out",
+        scrollTrigger: { trigger: group, start: "top 88%", once: true }
+      });
+    });
+  }
+})();
