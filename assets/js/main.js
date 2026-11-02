@@ -291,7 +291,7 @@
       const routeTimeline = gsap.timeline({
         scrollTrigger: {
           trigger: ".showcase__stage",
-          start: pinStage ? "top 16%" : "top 82%",
+          start: pinStage ? "top 22%" : "top 82%",
           end: pinStage ? "+=70%" : "bottom 18%",
           scrub: 0.6,
           pin: pinStage,
